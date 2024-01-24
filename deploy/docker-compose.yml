@@ -1,0 +1,58 @@
+version: '3.9'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ./deploy/Dockerfile
+      target: prod
+    image: startup_forge:${STARTUP_FORGE_VERSION:-latest}
+    restart: always
+    env_file:
+    - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      STARTUP_FORGE_HOST: 0.0.0.0
+      STARTUP_FORGE_DB_HOST: startup_forge-db
+      STARTUP_FORGE_DB_PORT: 5432
+      STARTUP_FORGE_DB_USER: startup_forge
+      STARTUP_FORGE_DB_PASS: startup_forge
+      STARTUP_FORGE_DB_BASE: startup_forge
+
+  db:
+    image: postgres:13.8-bullseye
+    hostname: startup_forge-db
+    environment:
+      POSTGRES_PASSWORD: "startup_forge"
+      POSTGRES_USER: "startup_forge"
+      POSTGRES_DB: "startup_forge"
+    volumes:
+    - startup_forge-db-data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: pg_isready -U startup_forge
+      interval: 2s
+      timeout: 3s
+      retries: 40
+
+  migrator:
+    image: startup_forge:${STARTUP_FORGE_VERSION:-latest}
+    restart: "no"
+    command: alembic upgrade head
+    environment:
+      STARTUP_FORGE_DB_HOST: startup_forge-db
+      STARTUP_FORGE_DB_PORT: 5432
+      STARTUP_FORGE_DB_USER: startup_forge
+      STARTUP_FORGE_DB_PASS: startup_forge
+      STARTUP_FORGE_DB_BASE: startup_forge
+    depends_on:
+      db:
+        condition: service_healthy
+
+
+
+volumes:
+  startup_forge-db-data:
+    name: startup_forge-db-data

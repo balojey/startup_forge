@@ -1,0 +1,76 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: startup-forge
+  name: startup-forge-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: startup-forge-app
+  template:
+    metadata:
+      labels:
+        app: startup-forge-app
+    spec:
+      containers:
+      - name: app
+        image: startup_forge:latest
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: api-port
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        env:
+        - name: STARTUP_FORGE_HOST
+          value: "0.0.0.0"
+        - name: STARTUP_FORGE_WORKERS_COUNT
+          value: "10"
+        - name: STARTUP_FORGE_DB_HOST
+          value: "startup-forge-db-service"
+        resources:
+          limits:
+            memory: "200Mi"
+            cpu: "100m"
+        ports:
+        - containerPort: 8000
+          name: api-port
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: startup-forge
+  name: startup-forge-app-service
+spec:
+  selector:
+    app: startup-forge-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: api-port
+    name: api-port
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: startup-forge-app
+  namespace: startup-forge
+  labels:
+    name: startup-forge-app
+spec:
+  rules:
+  - host: startup-forge.local
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: startup-forge-app-service
+            port:
+              name: api-port
+
+---

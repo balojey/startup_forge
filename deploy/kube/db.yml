@@ -1,0 +1,74 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: startup-forge
+  name: startup-forge-db
+spec:
+  selector:
+    matchLabels:
+      app: startup-forge-db
+  template:
+    metadata:
+      labels:
+        app: startup-forge-db
+    spec:
+      containers:
+      - name: database
+        image: postgres:13.8-bullseye
+        resources:
+          limits:
+            memory: "300Mi"
+            cpu: "200m"
+        env:
+        - name: POSTGRES_PASSWORD
+          value: "startup_forge"
+        - name: POSTGRES_USER
+          value: "startup_forge"
+        - name: POSTGRES_DB
+          value: "startup_forge"
+        ports:
+        - containerPort: 5432
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: startup-forge
+  name: "startup-forge-db-service"
+spec:
+  selector:
+    app: startup-forge-db
+  ports:
+  - port: 5432
+    targetPort: 5432
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  namespace: startup-forge
+  name: startup-forge-migrator
+spec:
+  ttlSecondsAfterFinished: 100
+  template:
+    spec:
+      containers:
+      - name: migrator
+        image: startup_forge:latest
+        command:
+        - "alembic"
+        - "upgrade"
+        - "head"
+        resources:
+          limits:
+            memory: "200Mi"
+            cpu: "250m"
+        env:
+        - name: "STARTUP_FORGE_DB_HOST"
+          value: "startup-forge-db-service"
+      initContainers:
+      - name: wait-for-db
+        image: toschneck/wait-for-it:latest
+        command: ["./wait-for-it.sh", "-t", "60", "startup-forge-db-service:5432"]
+      restartPolicy: Never
+
+---
