@@ -31,20 +31,17 @@ class Industry(str, Enum):
     DIGITAL_MEDIA = "DIGITAL_MEDIA"
 
 
-class RelatedIndustry(list, Enum):
-    """
-    Options for related industries
-    """
-
-    FINTECH = [
+# Options for related industries
+RelatedIndustry = {
+    "FINTECH": [
         Industry.AI,
         Industry.ECOMMERCE,
         Industry.HEALTHCARE,
         Industry.LOGISTICS,
         Industry.SAAS,
         Industry.BLOCKCHAIN,
-    ]
-    AI = [
+    ],
+    "AI": [
         Industry.FINTECH,
         Industry.ECOMMERCE,
         Industry.HEALTHCARE,
@@ -58,8 +55,8 @@ class RelatedIndustry(list, Enum):
         Industry.CONSUMER,
         Industry.BLOCKCHAIN,
         Industry.DIGITAL_MEDIA,
-    ]
-    ECOMMERCE = [
+    ],
+    "ECOMMERCE": [
         Industry.FINTECH,
         Industry.AI,
         Industry.HEALTHCARE,
@@ -68,8 +65,8 @@ class RelatedIndustry(list, Enum):
         Industry.SAAS,
         Industry.CONSUMER,
         Industry.DIGITAL_MEDIA,
-    ]
-    HEALTHCARE = [
+    ],
+    "HEALTHCARE": [
         Industry.FINTECH,
         Industry.AI,
         Industry.ECOMMERCE,
@@ -81,22 +78,22 @@ class RelatedIndustry(list, Enum):
         Industry.CONSUMER,
         Industry.BLOCKCHAIN,
         Industry.DIGITAL_MEDIA,
-    ]
-    EDTECH = [Industry.AI, Industry.HEALTHCARE, Industry.DIGITAL_MEDIA]
-    HEALTHTECH = [
+    ],
+    "EDTECH": [Industry.AI, Industry.HEALTHCARE, Industry.DIGITAL_MEDIA],
+    "HEALTHTECH": [
         Industry.AI,
         Industry.HEALTHCARE,
         Industry.LOGISTICS,
         Industry.BLOCKCHAIN,
         Industry.DIGITAL_MEDIA,
-    ]
-    CYBERSECURITY = [
+    ],
+    "CYBERSECURITY": [
         Industry.AI,
         Industry.HEALTHCARE,
         Industry.LOGISTICS,
         Industry.BLOCKCHAIN,
-    ]
-    LOGISTICS = [
+    ],
+    "LOGISTICS": [
         Industry.FINTECH,
         Industry.AI,
         Industry.HEALTHCARE,
@@ -104,38 +101,38 @@ class RelatedIndustry(list, Enum):
         Industry.ECOMMERCE,
         Industry.REAL_ESTATE,
         Industry.BLOCKCHAIN,
-    ]
-    MUSIC_ENTERTAINMENT = [Industry.AI, Industry.DIGITAL_MEDIA]
-    REAL_ESTATE = [
+    ],
+    "MUSIC_ENTERTAINMENT": [Industry.AI, Industry.DIGITAL_MEDIA],
+    "REAL_ESTATE": [
         Industry.FINTECH,
         Industry.ECOMMERCE,
         Industry.HEALTHCARE,
         Industry.LOGISTICS,
         Industry.SAAS,
         Industry.DIGITAL_MEDIA,
-    ]
-    SAAS = [
+    ],
+    "SAAS": [
         Industry.FINTECH,
         Industry.AI,
         Industry.ECOMMERCE,
         Industry.LOGISTICS,
         Industry.REAL_ESTATE,
         Industry.DIGITAL_MEDIA,
-    ]
-    CONSUMER = [
+    ],
+    "CONSUMER": [
         Industry.AI,
         Industry.ECOMMERCE,
         Industry.REAL_ESTATE,
         Industry.DIGITAL_MEDIA,
-    ]
-    BLOCKCHAIN = [
+    ],
+    "BLOCKCHAIN": [
         Industry.FINTECH,
         Industry.AI,
         Industry.HEALTHTECH,
         Industry.CYBERSECURITY,
         Industry.LOGISTICS,
-    ]
-    DIGITAL_MEDIA = [
+    ],
+    "DIGITAL_MEDIA": [
         Industry.AI,
         Industry.ECOMMERCE,
         Industry.HEALTHTECH,
@@ -144,7 +141,8 @@ class RelatedIndustry(list, Enum):
         Industry.SAAS,
         Industry.CONSUMER,
         Industry.BLOCKCHAIN,
-    ]
+    ],
+}
 
 
 class Day(str, Enum):

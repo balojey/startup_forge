@@ -15,7 +15,9 @@ class Experience(BaseModel, Base):
 
     __tablename__ = "experience"
 
-    user_id: Mapped[UUID] = mapped_column(Uuid(), ForeignKey("user.id"))
+    user_id: Mapped[UUID] = mapped_column(
+        Uuid(), ForeignKey("user.id", ondelete="CASCADE", onupdate="CASCADE")
+    )
     company_name: Mapped[str] = mapped_column(String(), nullable=False)
     description: Mapped[str] = mapped_column(Text(), nullable=True)
     start_date: Mapped[date] = mapped_column(Date(), nullable=False)

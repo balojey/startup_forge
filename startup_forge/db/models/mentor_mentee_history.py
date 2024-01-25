@@ -17,10 +17,14 @@ class MentorMenteeHistory(BaseModel, Base):
     __tablename__ = "mentor_mentee_history"
 
     mentor_id: Mapped[UUID] = mapped_column(
-        Uuid(), ForeignKey("user.id"), nullable=False
+        Uuid(),
+        ForeignKey("user.id", ondelete="CASCADE", onupdate="CASCADE"),
+        nullable=False,
     )
     mentee_id: Mapped[UUID] = mapped_column(
-        Uuid(), ForeignKey("user.id"), nullable=False
+        Uuid(),
+        ForeignKey("user.id", ondelete="CASCADE", onupdate="CASCADE"),
+        nullable=False,
     )
     start_date: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False

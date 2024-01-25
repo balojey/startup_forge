@@ -70,7 +70,9 @@ def get_jwt_strategy() -> JWTStrategy:
 
     :returns: instance of JWTStrategy with provided settings.
     """
-    return JWTStrategy(secret=settings.users_secret, lifetime_seconds=None)
+    return JWTStrategy(
+        secret=settings.users_secret, lifetime_seconds=settings.jwt_lifetime_seconds
+    )
 
 
 bearer_transport = BearerTransport(tokenUrl="auth/jwt/login")

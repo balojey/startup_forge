@@ -40,6 +40,7 @@ class Settings(BaseSettings):
 
     log_level: LogLevel = LogLevel.INFO
     users_secret: str = os.getenv("USERS_SECRET", "")
+    jwt_lifetime_seconds: int = os.getenv("STARTUP_FORGE_JWT_LIFETIME_SECONDS")
     # Variables for the database
     db_host: str = "localhost"
     db_port: int = 5432

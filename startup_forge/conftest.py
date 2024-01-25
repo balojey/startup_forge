@@ -1,3 +1,4 @@
+import uuid
 from typing import Any, AsyncGenerator
 
 import pytest
@@ -12,6 +13,9 @@ from sqlalchemy.ext.asyncio import (
 
 from startup_forge.db.dependencies import get_db_session
 from startup_forge.db.utils import create_database, drop_database
+from startup_forge.db.models.profile import Profile
+from startup_forge.db.models.options import Role
+from startup_forge.db.dao.profile_dao import ProfileDAO
 from startup_forge.settings import settings
 from startup_forge.web.application import get_app
 
@@ -108,3 +112,300 @@ async def client(
     """
     async with AsyncClient(app=fastapi_app, base_url="http://test") as ac:
         yield ac
+
+
+# =====================================================================================
+
+
+@pytest.fixture
+async def authenticated_client(fastapi_app: FastAPI, client: AsyncClient):
+    """
+    Create an authenticated client by adding the authentication token to the headers.
+
+    :param fastapi_app: the application.
+    :yield: client for the app.
+    """
+
+    register_url = fastapi_app.url_path_for("register:register")
+    register_response = await client.post(
+        register_url,
+        json={
+            "email": "test@email.com",
+            "password": "school",
+            "is_active": True,
+            "is_superuser": False,
+            "is_verified": False,
+        },
+    )
+    login_url = fastapi_app.url_path_for("auth:jwt.login")
+    login_response = await client.post(
+        login_url,
+        data={
+            "grant_type": "",
+            "username": "test@email.com",
+            "password": "school",
+            "scope": "",
+            "client_id": "",
+            "client_secret": "",
+        },
+    )
+    client.headers.update(
+        {
+            "Authorization": f"{login_response.json()['token_type']} {login_response.json()['access_token']}"
+        }
+    )
+    return client
+
+
+@pytest.fixture
+async def authenticated_client2(fastapi_app: FastAPI, client: AsyncClient):
+    """
+    Create an authenticated client by adding the authentication token to the headers.
+
+    :param fastapi_app: the application.
+    :yield: client for the app.
+    """
+
+    register_url = fastapi_app.url_path_for("register:register")
+    register_response = await client.post(
+        register_url,
+        json={
+            "email": "test2@email.com",
+            "password": "school",
+            "is_active": True,
+            "is_superuser": False,
+            "is_verified": False,
+        },
+    )
+    login_url = fastapi_app.url_path_for("auth:jwt.login")
+    login_response = await client.post(
+        login_url,
+        data={
+            "grant_type": "",
+            "username": "test2@email.com",
+            "password": "school",
+            "scope": "",
+            "client_id": "",
+            "client_secret": "",
+        },
+    )
+    client.headers.update(
+        {
+            "Authorization": f"{login_response.json()['token_type']} {login_response.json()['access_token']}"
+        }
+    )
+    return client
+
+
+@pytest.fixture
+async def authenticated_client3(fastapi_app: FastAPI, client: AsyncClient):
+    """
+    Create an authenticated client by adding the authentication token to the headers.
+
+    :param fastapi_app: the application.
+    :yield: client for the app.
+    """
+
+    register_url = fastapi_app.url_path_for("register:register")
+    register_response = await client.post(
+        register_url,
+        json={
+            "email": "test3@email.com",
+            "password": "school",
+            "is_active": True,
+            "is_superuser": False,
+            "is_verified": False,
+        },
+    )
+    login_url = fastapi_app.url_path_for("auth:jwt.login")
+    login_response = await client.post(
+        login_url,
+        data={
+            "grant_type": "",
+            "username": "test3@email.com",
+            "password": "school",
+            "scope": "",
+            "client_id": "",
+            "client_secret": "",
+        },
+    )
+    client.headers.update(
+        {
+            "Authorization": f"{login_response.json()['token_type']} {login_response.json()['access_token']}"
+        }
+    )
+    return client
+
+
+@pytest.fixture
+async def mentor_profile(
+    authenticated_client: AsyncClient, dbsession: AsyncSession, fastapi_app: FastAPI
+) -> Profile:
+    """
+    Create a mentor profile.
+
+    :param fastapi_app: the application.
+    :yield: client for the app.
+    """
+
+    url = fastapi_app.url_path_for("create_profile")
+    first_name = uuid.uuid4().hex
+    last_name = uuid.uuid4().hex
+    response = await authenticated_client.post(
+        url,
+        json={
+            "first_name": first_name,
+            "last_name": last_name,
+            "role": Role.MENTOR,
+        },
+    )
+
+    dao = ProfileDAO(dbsession)
+    instances = await dao.filter(first_name=first_name)
+
+    return instances[0]
+
+
+@pytest.fixture
+async def mentor_profile2(
+    authenticated_client2: AsyncClient, dbsession: AsyncSession, fastapi_app: FastAPI
+) -> Profile:
+    """
+    Create a mentor profile.
+
+    :param fastapi_app: the application.
+    :yield: client for the app.
+    """
+
+    url = fastapi_app.url_path_for("create_profile")
+    first_name = uuid.uuid4().hex
+    last_name = uuid.uuid4().hex
+    response = await authenticated_client2.post(
+        url,
+        json={
+            "first_name": first_name,
+            "last_name": last_name,
+            "role": Role.MENTOR,
+        },
+    )
+
+    dao = ProfileDAO(dbsession)
+    instances = await dao.filter(first_name=first_name)
+
+    return instances[0]
+
+
+@pytest.fixture
+async def mentor_profile3(
+    authenticated_client3: AsyncClient, dbsession: AsyncSession, fastapi_app: FastAPI
+) -> Profile:
+    """
+    Create a mentor profile.
+
+    :param fastapi_app: the application.
+    :yield: client for the app.
+    """
+
+    url = fastapi_app.url_path_for("create_profile")
+    first_name = uuid.uuid4().hex
+    last_name = uuid.uuid4().hex
+    response = await authenticated_client3.post(
+        url,
+        json={
+            "first_name": first_name,
+            "last_name": last_name,
+            "role": Role.MENTOR,
+        },
+    )
+
+    dao = ProfileDAO(dbsession)
+    instances = await dao.filter(first_name=first_name)
+
+    return instances[0]
+
+
+@pytest.fixture
+async def mentee_profile(
+    authenticated_client: AsyncClient, dbsession: AsyncSession, fastapi_app: FastAPI
+) -> Profile:
+    """
+    Create a mentor profile.
+
+    :param fastapi_app: the application.
+    :yield: client for the app.
+    """
+
+    url = fastapi_app.url_path_for("create_profile")
+    first_name = uuid.uuid4().hex
+    last_name = uuid.uuid4().hex
+    response = await authenticated_client.post(
+        url,
+        json={
+            "first_name": first_name,
+            "last_name": last_name,
+            "role": Role.MENTEE,
+        },
+    )
+
+    dao = ProfileDAO(dbsession)
+    instances = await dao.filter(first_name=first_name)
+
+    return instances[0]
+
+
+@pytest.fixture
+async def mentee_profile(
+    authenticated_client2: AsyncClient, dbsession: AsyncSession, fastapi_app: FastAPI
+) -> Profile:
+    """
+    Create a mentor profile.
+
+    :param fastapi_app: the application.
+    :yield: client for the app.
+    """
+
+    url = fastapi_app.url_path_for("create_profile")
+    first_name = uuid.uuid4().hex
+    last_name = uuid.uuid4().hex
+    response = await authenticated_client2.post(
+        url,
+        json={
+            "first_name": first_name,
+            "last_name": last_name,
+            "role": Role.MENTEE,
+        },
+    )
+
+    dao = ProfileDAO(dbsession)
+    instances = await dao.filter(first_name=first_name)
+
+    return instances[0]
+
+
+@pytest.fixture
+async def mentee_profile(
+    authenticated_client3: AsyncClient, dbsession: AsyncSession, fastapi_app: FastAPI
+) -> Profile:
+    """
+    Create a mentor profile.
+
+    :param fastapi_app: the application.
+    :yield: client for the app.
+    """
+
+    url = fastapi_app.url_path_for("create_profile")
+    first_name = uuid.uuid4().hex
+    last_name = uuid.uuid4().hex
+    response = await authenticated_client3.post(
+        url,
+        json={
+            "first_name": first_name,
+            "last_name": last_name,
+            "role": Role.MENTEE,
+        },
+    )
+
+    dao = ProfileDAO(dbsession)
+    instances = await dao.filter(first_name=first_name)
+
+    return instances[0]
