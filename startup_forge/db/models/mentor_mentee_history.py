@@ -4,7 +4,7 @@ from uuid import UUID
 from sqlalchemy import ForeignKey, Enum
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
-from sqlalchemy.sql.sqltypes import String, Uuid, DateTime, Text
+from sqlalchemy.sql.sqltypes import Uuid, DateTime, Text
 
 from startup_forge.db.base import Base
 from startup_forge.db.models.base_model import BaseModel

@@ -3,7 +3,7 @@ from uuid import UUID, uuid4
 
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
-from sqlalchemy.sql.sqltypes import String, DateTime
+from sqlalchemy.sql.sqltypes import DateTime
 
 
 class BaseModel:

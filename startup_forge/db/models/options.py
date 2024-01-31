@@ -157,3 +157,89 @@ class Day(str, Enum):
     FRIDAY = "FRIDAY"
     SATURDAY = "SATURDAY"
     SUNDAY = "SUNDAY"
+
+
+class Platform(str, Enum):
+    """
+    Options for platforms
+    """
+
+    TWITTER = "TWITTER"
+    LINKEDIN = "LINKEDIN"
+    FACEBOOK = "FACEBOOK"
+    INSTAGRAM = "INSTAGRAM"
+    WHATSAPP = "WHATSAPP"
+
+
+class ExpertiseName(str, Enum):
+    """
+    Options for expertises
+    """
+
+    BRANDING = "BRANDING"
+    MARKETING = "MARKETING"
+
+
+class SkillName(str, Enum):
+    """
+    Options for skills
+    """
+
+    LEADERSHIP = "LEADERSHIP"
+    COMMUNICATION = "COMMUNICATION"
+    TEAM_WORK = "TEAM WORK"
+
+
+class LanguageName(str, Enum):
+    """
+    Options for languages
+    """
+
+    ENGLISH = "ENGLISH"
+    SPANISH = "SPANISH"
+    ARABIC = "ARABIC"
+
+
+class LanguageLevel(str, Enum):
+    """
+    Options for language levels
+    """
+
+    BASIC = "BASIC"
+    CONVERSATIONAL = "CONVERSATIONAL"
+    FLUENT = "FLUENT"
+
+
+class ConnectionRequestStatus(str, Enum):
+    """
+    Options for connection requests status
+    """
+
+    PENDING = "PENDING"
+    ACCEPTED = "ACCEPTED"
+    REJECTED = "REJECTED"
+    CANCELED = "CANCELED"
+
+
+class BookingStatus(str, Enum):
+    """
+    Options for booking status
+    """
+
+    PENDING = "PENDING"
+    APPROVED = "APPROVED"
+    RESCHEDULED = "RESCHEDULED"
+    REJECTED = "REJECTED"
+    CANCELED = "CANCELED"
+    COMPLETED = "COMPLETED"
+
+
+class BookingStatus2(str, Enum):
+    """
+    Options for booking status 2
+    """
+
+    APPROVED = "APPROVED"
+    REJECTED = "REJECTED"
+    CANCELED = "CANCELED"
+    COMPLETED = "COMPLETED"

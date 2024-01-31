@@ -4,7 +4,7 @@ from uuid import UUID
 from sqlalchemy import PrimaryKeyConstraint, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
-from sqlalchemy.sql.sqltypes import String, Uuid, DateTime
+from sqlalchemy.sql.sqltypes import Uuid, DateTime
 
 from startup_forge.db.base import Base
 
