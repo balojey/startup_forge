@@ -41,7 +41,7 @@ class Booking(BaseModel, Base):
     UniqueConstraint(user_id, time_slot_id, date)
 
 
-class BookingActivity(BaseModel, Base):
+class BookingActivity(Base):
     """Model for booking activity."""
 
     __tablename__ = "booking_activity"
@@ -51,5 +51,7 @@ class BookingActivity(BaseModel, Base):
         Enum(BookingStatus), nullable=True
     )
     booking_id: Mapped[UUID] = mapped_column(
-        Uuid(), ForeignKey("booking.id", ondelete="CASCADE", onupdate="CASCADE")
+        Uuid(),
+        ForeignKey("booking.id", ondelete="CASCADE", onupdate="CASCADE"),
+        primary_key=True,
     )

@@ -218,7 +218,6 @@ class ConnectionRequestStatus(str, Enum):
     PENDING = "PENDING"
     ACCEPTED = "ACCEPTED"
     REJECTED = "REJECTED"
-    CANCELED = "CANCELED"
 
 
 class BookingStatus(str, Enum):

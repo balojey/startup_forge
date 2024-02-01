@@ -4,6 +4,7 @@ from typing import List, Optional
 
 from fastapi import Depends
 from sqlalchemy import select
+from sqlalchemy.sql import func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from startup_forge.db.dependencies import get_db_session
@@ -106,6 +107,7 @@ class ExperienceDAO:
         experience.industry = industry if industry else experience.industry
 
         # save experience
+        experience.updated_at = func.now()
         self.session.add(experience)
 
     async def delete_experience(self, experience_id: UUID) -> None:
@@ -119,7 +121,7 @@ class ExperienceDAO:
         )  # get experience
 
         # delete experience
-        self.session.delete(experience)
+        await self.session.delete(experience)
 
     async def delete_experiences(self, experiences: list[Experience]) -> None:
         """
@@ -128,7 +130,7 @@ class ExperienceDAO:
         :param experiences: list of the experiences.
         """
         for experience in experiences:
-            self.session.delete(experience)  # delete experience
+            await self.session.delete(experience)  # delete experience
 
     async def filter(
         self,

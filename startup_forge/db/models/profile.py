@@ -1,6 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
+from pydantic import HttpUrl
 from sqlalchemy import ForeignKey, Enum
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
@@ -38,6 +39,12 @@ class Profile(Base):
     )
     skills: Mapped[list[SkillName]] = mapped_column(ARRAY(String), nullable=True)
     profile_picture_url: Mapped[str] = mapped_column(String(length=100), nullable=True)
+    languages: Mapped[list[list[LanguageName, LanguageLevel]]] = mapped_column(
+        ARRAY(String, dimensions=2), nullable=True
+    )
+    social_links: Mapped[list[list[Platform, HttpUrl]]] = mapped_column(
+        ARRAY(String, dimensions=2), nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
@@ -54,27 +61,27 @@ class Profile(Base):
         return self.role == Role.MENTOR
 
 
-class SocialLink(BaseModel, Base):
-    """Model for social links"""
+# class SocialLink(BaseModel, Base):
+#     """Model for social links"""
 
-    __tablename__ = "social_link"
+#     __tablename__ = "social_link"
 
-    user_id: Mapped[UUID] = mapped_column(
-        Uuid(),
-        ForeignKey("user.id", ondelete="CASCADE", onupdate="CASCADE"),
-    )
-    platform: Mapped[Platform] = mapped_column(Enum(Platform))
-    link: Mapped[str] = mapped_column(String(length=150))
+#     user_id: Mapped[UUID] = mapped_column(
+#         Uuid(),
+#         ForeignKey("user.id", ondelete="CASCADE", onupdate="CASCADE"),
+#     )
+#     platform: Mapped[Platform] = mapped_column(Enum(Platform))
+#     link: Mapped[str] = mapped_column(String(length=150))
 
 
-class Language(BaseModel, Base):
-    """Model for languages"""
+# class Language(BaseModel, Base):
+#     """Model for languages"""
 
-    __tablename__ = "language"
+#     __tablename__ = "language"
 
-    user_id: Mapped[UUID] = mapped_column(
-        Uuid(),
-        ForeignKey("user.id", ondelete="CASCADE", onupdate="CASCADE"),
-    )
-    name: Mapped[LanguageName] = mapped_column(Enum(LanguageName))
-    level: Mapped[LanguageLevel] = mapped_column(Enum(LanguageLevel))
+#     user_id: Mapped[UUID] = mapped_column(
+#         Uuid(),
+#         ForeignKey("user.id", ondelete="CASCADE", onupdate="CASCADE"),
+#     )
+#     name: Mapped[LanguageName] = mapped_column(Enum(LanguageName))
+#     level: Mapped[LanguageLevel] = mapped_column(Enum(LanguageLevel))
