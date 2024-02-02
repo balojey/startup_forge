@@ -149,29 +149,3 @@ async def reject_request(
     await connection_dao.reject_request(
         request_from=request_from, request_to=request_to
     )
-
-
-@router.patch("/")
-async def update_profile(
-    profile_object: ProfileUpdateDTO,
-    user: User = Depends(current_active_user),
-    profile_dao: ProfileDAO = Depends(),
-) -> None:
-    """
-    Updates profile in the database.
-
-    :param profile_object: profile item.
-    :param profile_dao: DAO for profiles.
-    """
-    profile = await profile_dao.get_profile(user.id)  # get profile
-    if not profile:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=ErrorMessage.PROFILE_DOES_NOT_EXIST,
-        )
-    await profile_dao.update_profile(
-        user_id=user.id,
-        role=profile_object.role,
-        first_name=profile_object.first_name,
-        last_name=profile_object.last_name,
-    )
