@@ -3,86 +3,113 @@ from typing import List
 from fastapi import APIRouter, HTTPException, status
 from fastapi.param_functions import Depends
 
+from startup_forge.db.dao.review_dao import ReviewDAO
 from startup_forge.db.dao.profile_dao import ProfileDAO
 from startup_forge.db.models.users import User, current_active_user
-from startup_forge.db.models.profile import Profile
-from startup_forge.web.api.profile.schema import (
-    ProfileDTO,
-    ProfileInputDTO,
-    ProfileUpdateDTO,
-)
-from startup_forge.web.error_message import ErrorMessage
+from startup_forge.db.models.review import Review
+from startup_forge.web.api.review.schema import *
+from startup_forge.web.error_message import ProfileErrorDetails, ReviewErrorDetails
 
 router = APIRouter()
 
 
-@router.get("/", response_model=ProfileDTO)
-async def get_profile(
+@router.post("/", status_code=status.HTTP_201_CREATED)
+async def create_review(
+    review_object: ReviewInputDTO,
     user: User = Depends(current_active_user),
     profile_dao: ProfileDAO = Depends(),
-) -> Profile:
+    review_dao: ReviewDAO = Depends(),
+) -> None:
     """
-    Retrieve a profile object from the database.
+    Creates review in the database.
 
+    :param review_object: new review item.
     :param user: current user.
-    :return: profile object from database.
+    :param profile_dao: profile dao.
+    :param review_dao: review dao.
     """
-    profile = await profile_dao.get_profile(user.id)
+    profile = await profile_dao.get_profile(user_id=user.id)  # get profile
     if not profile:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=ErrorMessage.PROFILE_DOES_NOT_EXIST,
+            detail=ProfileErrorDetails.PROFILE_DOES_NOT_EXIST,
         )
-    return profile
-
-
-@router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_profile(
-    profile_object: ProfileInputDTO,
-    user: User = Depends(current_active_user),
-    profile_dao: ProfileDAO = Depends(),
-) -> None:
-    """
-    Creates profile in the database.
-
-    :param profile_object: new profile item.
-    :param profile_dao: DAO for profiles.
-    """
-    profile = await profile_dao.get_profile(user.id)  # get profile
-    if profile:  # check if profile already exists
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=ErrorMessage.PROFILE_ALREADY_EXISTS,
-        )
-    await profile_dao.create_profile(
+    await review_dao.record_review(
         user_id=user.id,
-        role=profile_object.role,
-        first_name=profile_object.first_name,
-        last_name=profile_object.last_name,
+        mentor_id=review_object.mentor_id,
+        content=review_object.content,
     )
 
 
-@router.patch("/")
-async def update_profile(
-    profile_object: ProfileUpdateDTO,
+@router.patch("/{review_id}", status_code=status.HTTP_201_CREATED)
+async def update_review(
+    review_object: ReviewUpdateDTO,
+    review_id: UUID,
     user: User = Depends(current_active_user),
+    profile_dao: ProfileDAO = Depends(),
+    review_dao: ReviewDAO = Depends(),
+) -> None:
+    """
+    Creates review in the database.
+
+    :param review_object: new review item.
+    :param review_id: review id.
+    :param user: current user.
+    :param profile_dao: profile dao.
+    :param review_dao: review dao.
+    """
+    profile = await profile_dao.get_profile(user_id=user.id)  # get profile
+    if not profile:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=ProfileErrorDetails.PROFILE_DOES_NOT_EXIST,
+        )
+    review = await review_dao.get_review(review_id=review_id)
+    if not review:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=ReviewErrorDetails.REVIEW_DOES_NOT_EXIST,
+        )
+    if review.user_id != user.id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=ProfileErrorDetails.UNAUTHORIZED,
+        )
+    await review_dao.update_review(
+        review_id=review.id,
+        content=review_object.content,
+    )
+
+
+@router.delete("/{review_id}")
+async def delete_education(
+    review_id: UUID,
+    user: User = Depends(current_active_user),
+    review_dao: ReviewDAO = Depends(),
     profile_dao: ProfileDAO = Depends(),
 ) -> None:
     """
-    Updates profile in the database.
+    Deletes a review object in the database.
 
-    :param profile_object: profile item.
+    :param review_id: review id.
+    :param user: current user.
+    :param review_dao: review dao.
     :param profile_dao: DAO for profiles.
     """
     profile = await profile_dao.get_profile(user.id)  # get profile
     if not profile:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=ErrorMessage.PROFILE_DOES_NOT_EXIST,
+            detail=ProfileErrorDetails.PROFILE_DOES_NOT_EXIST,
         )
-    await profile_dao.update_profile(
-        user_id=user.id,
-        role=profile_object.role,
-        first_name=profile_object.first_name,
-        last_name=profile_object.last_name,
+    review = await review_dao.get_review(review_id=review_id)
+    if not review:
+        return
+    if user.id != review.mentee_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=ProfileErrorDetails.UNAUTHORIZED,
+        )
+    await review_dao.delete_review(
+        review_id=review_id,
     )

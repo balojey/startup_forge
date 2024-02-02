@@ -8,13 +8,13 @@ class ReviewInputDTO(BaseModel):
     """DTO for creating review."""
 
     mentor_id: UUID
-    review: str
+    content: str
 
 
 class ReviewUpdateDTO(BaseModel):
     """DTO for updating review."""
 
-    review: str
+    content: str
 
 
 class ReviewDTO(ReviewInputDTO):
@@ -25,6 +25,8 @@ class ReviewDTO(ReviewInputDTO):
     """
 
     id: UUID
+    mentor_id: UUID
+    content: str
     created_at: datetime
     updated_at: datetime
     model_config = ConfigDict(from_attributes=True)

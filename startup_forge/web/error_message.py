@@ -33,6 +33,7 @@ class ProfileErrorDetails(str, Enum):
     UNAUTHORIZED = "UNAUTHORIZED"
     PROFILE_ROLE_NOT_MENTOR = "PROFILE_ROLE_NOT_MENTOR"
     PROFILE_ROLE_NOT_MENTEE = "PROFILE_ROLE_NOT_MENTEE"
+    PROFILE_ALREADY_EXISTS = "PROFILE_ALREADY_EXISTS"
 
 
 class EducationErrorDetails(str, Enum):
@@ -63,3 +64,9 @@ class CommunityErrorDetails(str, Enum):
 
     POST_NOT_FOUND = "POST_NOT_FOUND"
     COMMENT_NOT_FOUND = "COMMENT_NOT_FOUND"
+
+
+class ReviewErrorDetails(str, Enum):
+    """Review error details"""
+
+    REVIEW_DOES_NOT_EXIST = "REVIEW_DOES_NOT_EXIST"

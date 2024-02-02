@@ -42,17 +42,12 @@ class ProfileInputDTO(BaseModel):
     role: Role
 
 
-class MentorProfileInputDTO(BaseModel):
-    """DTO for updating new mentor profile"""
+# class MentorProfileInputDTO(BaseModel):
+#     """DTO for updating new mentor profile"""
 
-    years_of_experience: Optional[str]
-    bio: Optional[str]
-    linkedin_url: Optional[HttpUrl]
-    expertises: Optional[list[ExpertiseName]]
-    Skills: Optional[list[SkillName]]
-    profile_picture_url: Optional[HttpUrl]
-    languages: list[list[LanguageName, LanguageLevel]]
-    social_lists: list[list[Platform, HttpUrl]]
+#     years_of_experience: Optional[str]
+#     bio: Optional[str]
+#     linkedin_url: Optional[HttpUrl]
 
 
 class ProfileUpdateDTO(BaseModel):
@@ -60,8 +55,15 @@ class ProfileUpdateDTO(BaseModel):
 
     first_name: Optional[str] = None
     last_name: Optional[str] = None
-    years_of_experience: Optional[str]
-    bio: Optional[str]
+    years_of_experience: Optional[str] = None
+    bio: Optional[str] = None
+    expertises: Optional[list[ExpertiseName]] = None
+    Skills: Optional[list[SkillName]] = None
+    profile_picture_url: Optional[HttpUrl] = None
+    languages: list[list[LanguageName, LanguageLevel]] | list[
+        LanguageName, LanguageLevel
+    ] = None
+    social_lists: list[list[Platform, HttpUrl]] | list[Platform, HttpUrl] = None
 
 
 class ExpertiseDTO(BaseModel):
@@ -70,7 +72,7 @@ class ExpertiseDTO(BaseModel):
     names: list[ExpertiseName] | ExpertiseName
 
 
-class SkillNameDTO(BaseModel):
+class SkillDTO(BaseModel):
     """DTO for skill."""
 
     names: list[SkillName] | SkillName
@@ -79,7 +81,7 @@ class SkillNameDTO(BaseModel):
 class SocialLinkDTO(BaseModel):
     """DTO for social link."""
 
-    link: list[list[Platform, HttpUrl]] | list[Platform, HttpUrl]
+    social_link: list[list[Platform, HttpUrl]] | list[Platform, HttpUrl]
 
 
 class SocialLinkDeleteDTO(BaseModel):
@@ -91,7 +93,7 @@ class SocialLinkDeleteDTO(BaseModel):
 class LanguageDTO(BaseModel):
     """DTO for language."""
 
-    language: list[list[LanguageName, LanguageLevel]] | list[
+    languages: list[list[LanguageName, LanguageLevel]] | list[
         LanguageName, LanguageLevel
     ]
 

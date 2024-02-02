@@ -107,19 +107,17 @@ class EducationDAO:
         return education.scalars().first()
 
     async def get_educations(
-        self, education_id: UUID, user_id: UUID
-    ) -> Education | None:
+        self,
+        user_id: UUID,
+    ) -> list[Education] | None:
         """
         Get a user's educations.
 
-        :param education_id: id of the education.
         :param user_id: id of the user.
         :return: a list of education.
         """
         educations = await self.session.execute(
-            select(Education).where(
-                Education.id == education_id and Education.user_id == user_id
-            ),
+            select(Education).where(Education.user_id == user_id),
         )
 
         return list(educations.scalars().fetchall())

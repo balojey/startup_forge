@@ -13,6 +13,7 @@ from startup_forge.web.api.experience.schema import (
     ExperienceInputDTO,
     ExperienceUpdateDTO,
 )
+from startup_forge.db.models.options import Industry
 from startup_forge.web.error_message import ErrorMessage
 
 router = APIRouter()
@@ -182,3 +183,54 @@ async def delete_experiences(
             detail=ErrorMessage.EXPERIENCES_NOT_FOUND,
         )
     await experience_dao.delete_experiences(experiences=experiences)
+
+
+@router.get("/industries", response_model=list[ExperienceDTO])
+async def get_industries(
+    user_id: Optional[str] = None,
+    user: User = Depends(current_active_user),
+    experience_dao: ExperienceDAO = Depends(),
+) -> list[Industry]:
+    """
+    Retrieve a list of industry objects from the database.
+
+    :param user: current user.
+    :return: list of industry object from database.
+    """
+    if user_id:
+        u_id = user_id
+    else:
+        u_id = user.id
+    experiences = await experience_dao.get_experiences(u_id)
+    if len(experiences) < 1:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=ErrorMessage.EXPERIENCES_NOT_FOUND,
+        )
+    return [experience.industry for experience in experiences]
+
+
+@router.get("/", response_model=list[ExperienceDTO])
+async def get_current_experiences(
+    user_id: Optional[str] = None,
+    user: User = Depends(current_active_user),
+    experience_dao: ExperienceDAO = Depends(),
+) -> list[Experience]:
+    """
+    Retrieve a list of experience objects from the database.
+
+    :param user: current user.
+    :param experience: experience's data access model instance.
+    :return: list of experience object from database.
+    """
+    if user_id:
+        u_id = user_id
+    else:
+        u_id = user.id
+    experiences = await experience_dao.get_experiences(u_id)
+    if len(experiences) < 1:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=ErrorMessage.EXPERIENCES_NOT_FOUND,
+        )
+    return [experience for experience in experiences if experience.end_date != None]

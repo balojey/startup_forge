@@ -3,86 +3,140 @@ from typing import List
 from fastapi import APIRouter, HTTPException, status
 from fastapi.param_functions import Depends
 
+from startup_forge.db.dao.education_dao import EducationDAO
 from startup_forge.db.dao.profile_dao import ProfileDAO
 from startup_forge.db.models.users import User, current_active_user
-from startup_forge.db.models.profile import Profile
-from startup_forge.web.api.profile.schema import (
-    ProfileDTO,
-    ProfileInputDTO,
-    ProfileUpdateDTO,
-)
-from startup_forge.web.error_message import ErrorMessage
+from startup_forge.db.models.education import Education
+from startup_forge.web.api.education.schema import *
+from startup_forge.web.error_message import EducationErrorDetails, ProfileErrorDetails
 
 router = APIRouter()
 
 
-@router.get("/", response_model=ProfileDTO)
-async def get_profile(
+@router.get("/", response_model=EducationDTO)
+async def get_educations(
     user: User = Depends(current_active_user),
+    education_id: Optional[UUID] = None,
+    user_id: Optional[UUID] = None,
     profile_dao: ProfileDAO = Depends(),
-) -> Profile:
+    education_dao: EducationDAO = Depends(),
+) -> list[Education] | None:
     """
-    Retrieve a profile object from the database.
+    Retrieve a education objects from the database.
 
     :param user: current user.
-    :return: profile object from database.
+    :param education_id: education id.
+    :param user_id: a user id.
+    :param profile_dao: profile dao.
+    :param education_dao: education dao.
+    :return: education objects from database.
     """
-    profile = await profile_dao.get_profile(user.id)
+    profile = await profile_dao.get_profile(user_id=user.id)
     if not profile:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=ErrorMessage.PROFILE_DOES_NOT_EXIST,
+            detail=ProfileErrorDetails.PROFILE_DOES_NOT_EXIST,
         )
-    return profile
-
-
-@router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_profile(
-    profile_object: ProfileInputDTO,
-    user: User = Depends(current_active_user),
-    profile_dao: ProfileDAO = Depends(),
-) -> None:
-    """
-    Creates profile in the database.
-
-    :param profile_object: new profile item.
-    :param profile_dao: DAO for profiles.
-    """
-    profile = await profile_dao.get_profile(user.id)  # get profile
-    if profile:  # check if profile already exists
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=ErrorMessage.PROFILE_ALREADY_EXISTS,
+    if education_id:
+        return await education_dao.get_education(
+            education_id=education_id,
         )
-    await profile_dao.create_profile(
-        user_id=user.id,
-        role=profile_object.role,
-        first_name=profile_object.first_name,
-        last_name=profile_object.last_name,
+    return await education_dao.get_educations(
+        user_id=user.id if not user_id else user_id
     )
 
 
-@router.patch("/")
-async def update_profile(
-    profile_object: ProfileUpdateDTO,
+@router.post("/", status_code=status.HTTP_201_CREATED)
+async def create_education(
+    education_object: EducationInputDTO,
     user: User = Depends(current_active_user),
+    education_dao: EducationDAO = Depends(),
     profile_dao: ProfileDAO = Depends(),
 ) -> None:
     """
-    Updates profile in the database.
+    Creates eduction in the database.
 
-    :param profile_object: profile item.
+    :param education_object: new education item.
+    :param user: current user.
+    :param education_dao: education dao.
     :param profile_dao: DAO for profiles.
     """
     profile = await profile_dao.get_profile(user.id)  # get profile
     if not profile:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=ErrorMessage.PROFILE_DOES_NOT_EXIST,
+            detail=ProfileErrorDetails.PROFILE_DOES_NOT_EXIST,
         )
-    await profile_dao.update_profile(
+    await education_dao.record_education(
         user_id=user.id,
-        role=profile_object.role,
-        first_name=profile_object.first_name,
-        last_name=profile_object.last_name,
+        institution_name=education_object.institution_name,
+        course_of_study=education_object.course_of_study,
+        start_date=education_object.start_date,
+        state=education_object.state,
+        country=education_object.country,
+        end_date=education_object.end_date,
+    )
+
+
+@router.patch("/{education_id}")
+async def update_education(
+    education_id: UUID,
+    education_object: EducationUpdateDTO,
+    user: User = Depends(current_active_user),
+    education_dao: EducationDAO = Depends(),
+    profile_dao: ProfileDAO = Depends(),
+) -> None:
+    """
+    Updates eduction in the database.
+
+    :param education_id: education id.
+    :param education_object: new education item.
+    :param user: current user.
+    :param education_dao: education dao.
+    :param profile_dao: DAO for profiles.
+    """
+    profile = await profile_dao.get_profile(user.id)  # get profile
+    if not profile:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=ProfileErrorDetails.PROFILE_DOES_NOT_EXIST,
+        )
+    if not await education_dao.get_education(education_id=education_id):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=EducationErrorDetails.EDUCATION_DOES_NOT_EXIST,
+        )
+    await education_dao.update_education(
+        institution_name=education_object.institution_name,
+        course_of_study=education_object.course_of_study,
+        start_date=education_object.start_date,
+        state=education_object.state,
+        country=education_object.country,
+        end_date=education_object.end_date,
+    )
+
+
+@router.delete("/{education_id}")
+async def delete_education(
+    education_id: UUID,
+    user: User = Depends(current_active_user),
+    education_dao: EducationDAO = Depends(),
+    profile_dao: ProfileDAO = Depends(),
+) -> None:
+    """
+    Deletes an eduction object in the database.
+
+    :param education_id: education id.
+    :param user: current user.
+    :param education_dao: education dao.
+    :param profile_dao: DAO for profiles.
+    """
+    profile = await profile_dao.get_profile(user.id)  # get profile
+    if not profile:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=ProfileErrorDetails.PROFILE_DOES_NOT_EXIST,
+        )
+    await education_dao.delete_education(
+        education_id=education_id,
     )

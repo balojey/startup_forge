@@ -12,7 +12,7 @@ from startup_forge.db.models.connection import Connection, ConnectionRequest
 from startup_forge.db.models.options import ConnectionRequestStatus
 
 
-class EducationDAO:
+class ConnectionDAO:
     """Class for accessing education table."""
 
     def __init__(self, session: AsyncSession = Depends(get_db_session)):
@@ -84,28 +84,24 @@ class EducationDAO:
         :param request_from: id of the user who sent the request.
         :param request_to: id of the user who recieved the request.
         """
-        result = await self.session.execute(
-            select(ConnectionRequest).where(
-                ConnectionRequest.request_from == request_from
-                and ConnectionRequest.request_to == request_to
-            ),
+        request = await self.get_request(
+            request_to=request_to, request_from=request_from
         )
-
-        request = result.scalars().first()
 
         # change request status to accepted
-        request.status = ConnectionRequestStatus.ACCEPTED
+        if request.status != ConnectionRequestStatus.ACCEPTED:
+            request.status = ConnectionRequestStatus.ACCEPTED
 
-        # save the changes
-        self.session.add(request)
+            # save the changes
+            self.session.add(request)
 
-        # create the connection
-        self.session.add(
-            Connection(
-                request_from=request_from,
-                request_to=request_to,
+            # create the connection
+            self.session.add(
+                Connection(
+                    request_from=request_from,
+                    request_to=request_to,
+                )
             )
-        )
 
     async def reject_request(self, request_from: UUID, request_to: UUID) -> None:
         """
@@ -114,20 +110,16 @@ class EducationDAO:
         :param request_from: id of the user who sent the request.
         :param request_to: id of the user who recieved the request.
         """
-        result = await self.session.execute(
-            select(ConnectionRequest).where(
-                ConnectionRequest.request_from == request_from
-                and ConnectionRequest.request_to == request_to
-            ),
+        request = await self.get_request(
+            request_to=request_to, request_from=request_from
         )
 
-        request = result.scalars().first()
-
         # change request status to rejected
-        request.status = ConnectionRequestStatus.REJECTED
+        if request.status != ConnectionRequestStatus.REJECTED:
+            request.status = ConnectionRequestStatus.REJECTED
 
-        # save the changes
-        self.session.add(request)
+            # save the changes
+            self.session.add(request)
 
     async def get_connections(
         self,
@@ -150,5 +142,5 @@ class EducationDAO:
 
         connections_ids = [connection.request_from for connection in connections]
         connections_ids.extend([connection.request_to for connection in connections])
-        connections_ids = list(set(connections))
+        connections_ids = list(set(connections_ids)).remove(user_id)
         return connections_ids

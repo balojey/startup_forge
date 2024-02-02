@@ -122,7 +122,7 @@ class ProfileDAO:
         profile.updated_at = func.now()
         self.session.add(profile)
 
-    async def register_expertise(
+    async def register_expertises(
         self,
         user_id: UUID,
         expertise_names: list[ExpertiseName] | ExpertiseName,
@@ -149,7 +149,7 @@ class ProfileDAO:
         profile.updated_at = func.now()
         self.session.add(profile)
 
-    async def remove_expertise(
+    async def remove_expertises(
         self,
         user_id: UUID,
         expertise_names: list[ExpertiseName] | ExpertiseName,
@@ -171,7 +171,7 @@ class ProfileDAO:
         profile.updated_at = func.now()
         self.session.add(profile)
 
-    async def register_skill(
+    async def register_skills(
         self,
         user_id: UUID,
         skill_names: list[SkillName] | SkillName,
@@ -198,7 +198,7 @@ class ProfileDAO:
         profile.updated_at = func.now()
         self.session.add(profile)
 
-    async def remove_expertise(
+    async def remove_skills(
         self,
         user_id: UUID,
         skill_names: list[SkillName] | SkillName,
@@ -273,7 +273,7 @@ class ProfileDAO:
     async def register_social_link(
         self,
         user_id: UUID,
-        social_links: list[list[Platform, HttpUrl]],
+        social_links: list[list[Platform, HttpUrl]] | list[Platform, HttpUrl],
     ) -> None:
         """
         Register a social link
@@ -297,26 +297,26 @@ class ProfileDAO:
         profile.updated_at = func.now()
         self.session.add(profile)
 
-    async def remove_language(
+    async def remove_social_link(
         self,
         user_id: UUID,
-        language_name: LanguageName,
+        platform: Platform,
     ) -> None:
         """
-        Remove a language
+        Remove social link
 
         :param user_id: id of the profile owner.
-        :param language_name: skill name.
+        :param platform: name of platform.
         """
         profile = await self.get_profile(user_id=user_id)  # get the profile
 
         # edit profile
-        for language in profile.languages:
-            if language[0] == language_name:
-                profile.languages.remove(language)
+        for link in profile.social_links:
+            if link[0] == platform:
+                profile.social_links.remove(platform)
+                profile.updated_at = func.now()
 
         # save profile
-        profile.updated_at = func.now()
         self.session.add(profile)
 
     async def filter(
