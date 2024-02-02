@@ -129,11 +129,10 @@ class EducationDAO:
         # save the changes
         self.session.add(request)
 
-
     async def get_connections(
         self,
         user_id: UUID,
-    ) -> list[ConnectionRequest] | None:
+    ) -> list[UUID] | None:
         """
         Get a stream of connections.
 
@@ -141,7 +140,15 @@ class EducationDAO:
         :return: stream of connection.
         """
         requests = await self.session.execute(
-            select(ConnectionRequest).where(ConnectionRequest.request_to == user_id),
+            select(ConnectionRequest).where(
+                ConnectionRequest.request_to == user_id
+                or ConnectionRequest.request_from == user_id
+            ),
         )
 
-        return list(requests.scalars().fetchall())
+        connections = list(requests.scalars().fetchall())
+
+        connections_ids = [connection.request_from for connection in connections]
+        connections_ids.extend([connection.request_to for connection in connections])
+        connections_ids = list(set(connections))
+        return connections_ids

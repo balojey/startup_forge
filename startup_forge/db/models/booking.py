@@ -2,7 +2,7 @@ from datetime import time
 from uuid import UUID
 
 from sqlalchemy import ForeignKey, Enum, UniqueConstraint
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql.sqltypes import Uuid, Time, Date
 
 from startup_forge.db.base import Base
@@ -22,7 +22,11 @@ class TimeSlot(BaseModel, Base):
     start_time: Mapped[time] = mapped_column(Time(timezone=True), nullable=False)
     end_time: Mapped[time] = mapped_column(Time(timezone=True), nullable=False)
 
-    UniqueConstraint(day, start_time, end_time)
+    bookings: Mapped[list["Booking"]] = relationship(
+        "Booking", back_populates="time_slot"
+    )
+
+    UniqueConstraint(user_id, day, start_time, end_time)
 
 
 class Booking(BaseModel, Base):
@@ -37,6 +41,11 @@ class Booking(BaseModel, Base):
         Uuid(), ForeignKey("time_slot.id", ondelete="CASCADE", onupdate="CASCADE")
     )
     date: Mapped[date] = mapped_column(Date(), nullable=False)
+
+    time_slot: Mapped[TimeSlot] = relationship("TimeSlot", back_populates="booking")
+    booking_activity: Mapped["BookingActivity"] = relationship(
+        "BookingActivity", back_populates="booking"
+    )
 
     UniqueConstraint(user_id, time_slot_id, date)
 
@@ -54,4 +63,8 @@ class BookingActivity(Base):
         Uuid(),
         ForeignKey("booking.id", ondelete="CASCADE", onupdate="CASCADE"),
         primary_key=True,
+    )
+
+    booking: Mapped[Booking] = relationship(
+        "Booking", back_populates="booking_activity"
     )

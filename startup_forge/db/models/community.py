@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from sqlalchemy import ForeignKey, PrimaryKeyConstraint
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql.sqltypes import Uuid, String, Text, ARRAY
 
 from startup_forge.db.base import Base
@@ -19,6 +19,9 @@ class Post(BaseModel, Base):
     text: Mapped[str] = mapped_column(Text(), nullable=True)
     files_urls: Mapped[list[str]] = mapped_column(ARRAY(String), nullable=True)
 
+    comments: Mapped[list["Comment"]] = relationship("Comment", back_populates="post")
+    likes: Mapped[list["Like"]] = relationship("Like", back_populates="post")
+
 
 class Comment(BaseModel, Base):
     """Model for comment."""
@@ -33,6 +36,8 @@ class Comment(BaseModel, Base):
     )
     content: Mapped[str] = mapped_column(Text(), nullable=False)
 
+    post: Mapped["Post"] = relationship("Post", back_populates="comments")
+
 
 class Like(Base):
     """Model for like."""
@@ -46,6 +51,8 @@ class Like(Base):
         Uuid(), ForeignKey("post.id", ondelete="CASCADE", onupdate="CASCADE")
     )
 
+    post: Mapped["Post"] = relationship("Post", back_populates="likes")
+
     PrimaryKeyConstraint(user_id, post_id)
 
 
@@ -58,13 +65,15 @@ class CommentReply(Base):
         Uuid(), ForeignKey("comment.id", ondelete="CASCADE", onupdate="CASCADE")
     )
     reply_id: Mapped[UUID] = mapped_column(
-        Uuid(), ForeignKey("comment.id", ondelete="CASCADE", onupdate="CASCADE")
+        Uuid(),
+        ForeignKey("comment.id", ondelete="CASCADE", onupdate="CASCADE"),
+        nullable=True,
     )
 
     PrimaryKeyConstraint(comment_id, reply_id)
 
 
-class repost(Base):
+class Repost(Base):
     """Model for repost."""
 
     __tablename__ = "repost"
