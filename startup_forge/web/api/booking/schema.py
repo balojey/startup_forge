@@ -25,7 +25,7 @@ class BookingInputDTO(BaseModel):
     date: date
 
 
-class BookingInputDTO(BookingInputDTO):
+class BookingUpdateDTO(BookingInputDTO):
     """DTO for updating a booking"""
 
     pass

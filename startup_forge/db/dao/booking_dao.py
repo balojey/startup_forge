@@ -12,7 +12,7 @@ from startup_forge.db.models.booking import TimeSlot, Booking, BookingActivity
 from startup_forge.db.models.options import Day, BookingStatus, BookingStatus2, Role
 
 
-class EducationDAO:
+class BookingDAO:
     """Class for accessing education table."""
 
     def __init__(self, session: AsyncSession = Depends(get_db_session)):
@@ -58,7 +58,7 @@ class EducationDAO:
         :param end_time: end time.
         :return: a TimeSlot.
         """
-        request = await self.session.execute(
+        result = await self.session.execute(
             select(TimeSlot).where(
                 TimeSlot.user_id == user_id
                 and TimeSlot.start_time == start_time
@@ -67,7 +67,23 @@ class EducationDAO:
             ),
         )
 
-        return request.scalars().first()
+        return result.scalars().first()
+
+    async def get_time_slots(
+        self,
+        user_id: UUID,
+    ) -> TimeSlot | None:
+        """
+        Get a stream of connection requests education.
+
+        :param user_id: id of the user.
+        :return: a stream of TimeSlot.
+        """
+        results = await self.session.execute(
+            select(TimeSlot).where(TimeSlot.user_id == user_id),
+        )
+
+        return list(results.scalars().fetchall())
 
     async def update_time_slot(
         self,
@@ -149,6 +165,7 @@ class EducationDAO:
         self,
         booking_id: UUID,
         date: date,
+        user_role: Role,
     ) -> None:
         """
         Update a booking.
@@ -158,8 +175,14 @@ class EducationDAO:
         """
         booking = await self.get_booking_by_id(booking_id=booking_id)
 
+        if date == booking.date:
+            return
         # edit booking
         booking.date = date if date else booking.date
+        if user_role == Role.MENTEE:
+            booking.booking_activity.mentee_activity = BookingStatus.RESCHEDULED
+        else:
+            booking.booking_activity.mentor_activity = BookingStatus.RESCHEDULED
 
         # save
         booking.updated_at = func.now()
@@ -178,7 +201,51 @@ class EducationDAO:
         booking = await self.session.execute(
             select(Booking).where(Booking.id == booking_id)
         )
-        return booking.scalars.first()
+        return booking.scalars().first()
+
+    async def get_booking(
+        self,
+        user_id: UUID,
+        time_slot_id: UUID,
+        date: date,
+    ) -> Booking | None:
+        """
+        Get a booking.
+
+        :param user_id: user id.
+        :param time_slot_id: id of the time_slot.
+        :param date: date.
+        :return: a booking.
+        """
+        booking = await self.session.execute(
+            select(Booking).where(
+                Booking.user_id == user_id
+                and Booking.time_slot_id == time_slot_id
+                and Booking.date == date
+            )
+        )
+        return booking.scalars().first()
+
+    async def available(
+        self,
+        time_slot_id: UUID,
+        date: date,
+    ) -> Booking | None:
+        """
+        Get a booking.
+
+        :param time_slot_id: id of the time_slot.
+        :param date: date.
+        :return: a booking.
+        """
+        results = await self.session.execute(
+            select(Booking).where(
+                Booking.time_slot_id == time_slot_id and Booking.date == date
+            )
+        )
+        if results.scalars().fetchall().count() == 3:
+            return False
+        return True
 
     async def get_bookings(
         self,
@@ -195,7 +262,7 @@ class EducationDAO:
                 Booking.user_id == user_id or Booking.time_slot.user_id == user_id
             )
         )
-        return list(booking.scalars.fetchall())
+        return list(booking.scalars().fetchall())
 
     async def delete_booking(
         self,
@@ -250,8 +317,10 @@ class EducationDAO:
         )
 
         return bookings.scalars().fetchall().count()
-    
-    async def get_available_sessions(self, user_id: UUID) -> list[tuple[Day, date, time]]:
+
+    async def get_available_sessions(
+        self, user_id: UUID
+    ) -> list[tuple[Day, date, time]]:
         """
         Get mentor's available sessions.
 

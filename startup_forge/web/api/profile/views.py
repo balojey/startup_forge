@@ -1,3 +1,4 @@
+from datetime import date, time
 from typing import List
 
 from fastapi import APIRouter, HTTPException, status
@@ -6,9 +7,11 @@ from fastapi.param_functions import Depends
 from startup_forge.db.dao.profile_dao import ProfileDAO
 from startup_forge.db.dao.review_dao import ReviewDAO
 from startup_forge.db.dao.connection_dao import ConnectionDAO
+from startup_forge.db.dao.booking_dao import BookingDAO
 from startup_forge.db.models.users import User, current_active_user
 from startup_forge.db.models.profile import Profile
 from startup_forge.db.models.review import Review
+from startup_forge.db.models.options import Day
 from startup_forge.web.api.profile.schema import *
 from startup_forge.web.api.review.schema import *
 from startup_forge.web.error_message import ErrorMessage, ProfileErrorDetails
@@ -358,3 +361,33 @@ async def get_requests(
         profile_dao.get_profile(user_id=connection_id)
         for connection_id in connections_ids
     ]
+
+
+@router.get("/mentors/available")
+async def sessions(
+    user_id: Optional[UUID] = None,
+    user: User = Depends(current_active_user),
+    profile_dao: ProfileDAO = Depends(),
+    booking_dao: BookingDAO = Depends(),
+) -> list[tuple[Day, time, date]] | None:
+    """
+    Get mentor's available days and times.
+
+    :param user_id: user id.
+    :param user: current user.
+    :param profile_dao: DAO for profiles.
+    :param booking_dao: DAO for bookings.
+    """
+    profile = await profile_dao.get_profile(
+        user.id if not user_id else user_id
+    )  # get profile
+    if not profile:  # check if profile already exists
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=ProfileErrorDetails.PROFILE_DOES_NOT_EXIST,
+        )
+    if profile.role != Role.MENTOR:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=ProfileErrorDetails.PROFILE_ROLE_NOT_MENTOR,
+        )
