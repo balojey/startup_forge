@@ -120,6 +120,7 @@ class CommunityDAO:
         self,
         user_id: UUID,
         content: str,
+        post_id: UUID,
     ) -> Comment:
         """
         Add single comment to session.
@@ -131,6 +132,7 @@ class CommunityDAO:
         comment = Comment(
             user_id=user_id,
             content=content,
+            post_id=post_id,
         )
         self.session.add(comment)
         return comment

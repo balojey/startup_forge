@@ -26,7 +26,7 @@ class PostInputDTO(BaseModel):
 
     text: Optional[str]
     files_urls: Optional[HttpUrl]
-    post_id: Optional[UUID]
+    post_id: Optional[UUID] = None
 
 
 class PostUpdateDTO(BaseModel):
@@ -55,6 +55,7 @@ class CommentInputDTO(BaseModel):
     """DTO for creating comment."""
 
     content: str
+    comment_id: Optional[UUID] = None
 
 
 class CommentUpdateDTO(CommentInputDTO):
