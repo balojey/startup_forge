@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import Optional
+from typing import Optional, List, Tuple
 
 from pydantic import BaseModel, ConfigDict, HttpUrl
 
@@ -26,11 +26,12 @@ class ProfileDTO(BaseModel):
     role: Role
     years_of_experienc: Optional[str]
     bio: Optional[str]
-    expertises: Optional[list[ExpertiseName]]
-    Skills: Optional[list[SkillName]]
+    expertises: Optional[Tuple[ExpertiseName]]
+    skills: Optional[Tuple[SkillName]]
     profile_picture_url: Optional[HttpUrl]
-    languages: list[list[LanguageName, LanguageLevel]]
-    social_lists: list[list[Platform, HttpUrl]]
+    languages: Optional[List[Tuple[LanguageName, LanguageLevel]]]
+    social_lists: Optional[List[Tuple[Platform, HttpUrl]]]
+
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -42,14 +43,6 @@ class ProfileInputDTO(BaseModel):
     role: Role
 
 
-# class MentorProfileInputDTO(BaseModel):
-#     """DTO for updating new mentor profile"""
-
-#     years_of_experience: Optional[str]
-#     bio: Optional[str]
-#     linkedin_url: Optional[HttpUrl]
-
-
 class ProfileUpdateDTO(BaseModel):
     """DTO for updating profile."""
 
@@ -57,13 +50,16 @@ class ProfileUpdateDTO(BaseModel):
     last_name: Optional[str] = None
     years_of_experience: Optional[str] = None
     bio: Optional[str] = None
-    expertises: Optional[list[ExpertiseName]] = None
-    Skills: Optional[list[SkillName]] = None
+    expertises: Optional[Tuple[ExpertiseName]] = None
+    skills: Optional[Tuple[SkillName]] = None
     profile_picture_url: Optional[HttpUrl] = None
-    languages: list[list[LanguageName, LanguageLevel]] | list[
-        LanguageName, LanguageLevel
-    ] = None
-    social_lists: list[list[Platform, HttpUrl]] | list[Platform, HttpUrl] = None
+    languages: (
+        Optional[List[Tuple[LanguageName, LanguageLevel]]]
+        | Optional[Tuple[LanguageName, LanguageLevel]]
+    ) = None
+    social_lists: (
+        Optional[List[Tuple[Platform, HttpUrl]]] | Optional[Tuple[Platform, HttpUrl]]
+    ) = None
 
 
 class ExpertiseDTO(BaseModel):
@@ -81,7 +77,7 @@ class SkillDTO(BaseModel):
 class SocialLinkDTO(BaseModel):
     """DTO for social link."""
 
-    social_link: list[list[Platform, HttpUrl]] | list[Platform, HttpUrl]
+    social_link: List[Tuple[Platform, HttpUrl]] | Tuple[Platform, HttpUrl]
 
 
 class SocialLinkDeleteDTO(BaseModel):
@@ -93,9 +89,7 @@ class SocialLinkDeleteDTO(BaseModel):
 class LanguageDTO(BaseModel):
     """DTO for language."""
 
-    languages: list[list[LanguageName, LanguageLevel]] | list[
-        LanguageName, LanguageLevel
-    ]
+    languages: List[Tuple[LanguageName, LanguageLevel]] | Tuple[LanguageName, LanguageLevel]
 
 
 class LanguageDeleteDTO(BaseModel):

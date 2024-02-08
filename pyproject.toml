@@ -27,6 +27,7 @@ alembic = "^1.11.1"
 asyncpg = {version = "^0.28.0", extras = ["sa"]}
 aiofiles = "^23.1.0"
 httptools = "^0.6.0"
+fastapi-profiler = "^1.2.0"
 
 
 [tool.poetry.dev-dependencies]

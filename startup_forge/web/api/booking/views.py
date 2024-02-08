@@ -224,7 +224,7 @@ async def book(
     )
 
 
-@router.patch("/bookings/{booking_id}")
+@router.patch("/{booking_id}")
 async def update_booking(
     booking_id: UUID,
     booking_object: BookingUpdateDTO,
@@ -269,7 +269,7 @@ async def update_booking(
     await booking_dao.update_booking(booking.id, booking_object.date, profile.role)
 
 
-@router.get("/bookings")
+@router.get("/")
 async def get_bookings(
     user: User = Depends(current_active_user),
     profile_dao: ProfileDAO = Depends(),
@@ -293,7 +293,7 @@ async def get_bookings(
     )
 
 
-@router.patch("/bookings/{booking_id}/status")
+@router.patch("/{booking_id}/status")
 async def change_booking_status(
     booking_id: UUID,
     booking_status_object: BookingStatusDTO,
@@ -329,7 +329,7 @@ async def change_booking_status(
     )
 
 
-@router.get("/sessions/")
+@router.get("/sessions")
 async def sessions(
     user_id: Optional[UUID] = None,
     user: User = Depends(current_active_user),

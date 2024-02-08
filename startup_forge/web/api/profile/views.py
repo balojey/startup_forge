@@ -19,11 +19,11 @@ from startup_forge.web.error_message import ErrorMessage, ProfileErrorDetails
 router = APIRouter()
 
 
-@router.get("/", response_model=ProfileDTO)
+@router.get("/", response_model=ProfileDTO | None)
 async def get_profile(
     user: User = Depends(current_active_user),
     profile_dao: ProfileDAO = Depends(),
-) -> Profile:
+) -> Profile | None:
     """
     Retrieve a profile object from the database.
 
