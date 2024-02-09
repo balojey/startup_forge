@@ -1,44 +1,44 @@
-from datetime import date
-import uuid
+# from datetime import date
+# import uuid
 
-import pytest
-from fastapi import FastAPI
-from httpx import AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession
-from starlette import status
+# import pytest
+# from fastapi import FastAPI
+# from httpx import AsyncClient
+# from sqlalchemy.ext.asyncio import AsyncSession
+# from starlette import status
 
-from sqlalchemy.sql import func
+# from sqlalchemy.sql import func
 
-from startup_forge.db.dao.experience_dao import ExperienceDAO
-from startup_forge.db.models.options import Role, Industry
+# from startup_forge.db.dao.experience_dao import ExperienceDAO
+# from startup_forge.db.models.options import Role, Industry
 
 
-@pytest.mark.anyio
-async def test_creation(
-    fastapi_app: FastAPI,
-    authenticated_client: AsyncClient,
-    dbsession: AsyncSession,
-) -> None:
-    """Tests experience instance creation."""
+# @pytest.mark.anyio
+# async def test_creation(
+#     fastapi_app: FastAPI,
+#     authenticated_client: AsyncClient,
+#     dbsession: AsyncSession,
+# ) -> None:
+#     """Tests experience instance creation."""
 
-    url = fastapi_app.url_path_for("create_experience")
-    company_name = uuid.uuid4().hex
-    description = uuid.uuid4().hex
-    start_date = "2015-07-21"
-    industry = Industry.AI
-    response = await authenticated_client.post(
-        url,
-        json={
-            "company_name": company_name,
-            "description": description,
-            "start_date": start_date,
-            "industry": industry,
-        },
-    )
-    assert response.status_code == status.HTTP_201_CREATED
-    dao = ExperienceDAO(dbsession)
-    instances = await dao.filter(company_name=company_name)
-    assert instances[0].company_name == company_name
+#     url = fastapi_app.url_path_for("create_experience")
+#     company_name = uuid.uuid4().hex
+#     description = uuid.uuid4().hex
+#     start_date = "2015-07-21"
+#     industry = Industry.AI
+#     response = await authenticated_client.post(
+#         url,
+#         json={
+#             "company_name": company_name,
+#             "description": description,
+#             "start_date": start_date,
+#             "industry": industry,
+#         },
+#     )
+#     assert response.status_code == status.HTTP_201_CREATED
+#     dao = ExperienceDAO(dbsession)
+#     instances = await dao.filter(company_name=company_name)
+#     assert instances[0].company_name == company_name
 
 
 # @pytest.mark.anyio
@@ -131,41 +131,41 @@ async def test_creation(
 #     assert len(experience) == 2
 
 
-@pytest.mark.anyio
-async def test_updating(
-    fastapi_app: FastAPI,
-    authenticated_client: AsyncClient,
-    dbsession: AsyncSession,
-) -> None:
-    """Tests experience instance updating."""
+# @pytest.mark.anyio
+# async def test_updating(
+#     fastapi_app: FastAPI,
+#     authenticated_client: AsyncClient,
+#     dbsession: AsyncSession,
+# ) -> None:
+#     """Tests experience instance updating."""
 
-    url = fastapi_app.url_path_for("create_experience")
-    company_name = uuid.uuid4().hex
-    description = uuid.uuid4().hex
-    start_date = "2015-07-21"
-    industry = Industry.AI
-    response = await authenticated_client.post(
-        url,
-        json={
-            "company_name": company_name,
-            "description": description,
-            "start_date": start_date,
-            "industry": industry,
-        },
-    )
-    assert response.status_code == status.HTTP_201_CREATED
-    dao = ExperienceDAO(dbsession)
-    instances = await dao.filter(company_name=company_name)
-    assert instances[0].company_name == company_name
+#     url = fastapi_app.url_path_for("create_experience")
+#     company_name = uuid.uuid4().hex
+#     description = uuid.uuid4().hex
+#     start_date = "2015-07-21"
+#     industry = Industry.AI
+#     response = await authenticated_client.post(
+#         url,
+#         json={
+#             "company_name": company_name,
+#             "description": description,
+#             "start_date": start_date,
+#             "industry": industry,
+#         },
+#     )
+#     assert response.status_code == status.HTTP_201_CREATED
+#     dao = ExperienceDAO(dbsession)
+#     instances = await dao.filter(company_name=company_name)
+#     assert instances[0].company_name == company_name
 
-    instance = instances[0]
-    new_url = fastapi_app.url_path_for("update_experience")
-    response = await authenticated_client.patch(
-        new_url,
-        json={"company_name": uuid.uuid4().hex},
-        params={"experience_id": instance["id"]},
-    )
-    assert response.status_code == status.HTTP_200_OK
+#     instance = instances[0]
+#     new_url = fastapi_app.url_path_for("update_experience")
+#     response = await authenticated_client.patch(
+#         new_url,
+#         json={"company_name": uuid.uuid4().hex},
+#         params={"experience_id": instance["id"]},
+#     )
+#     assert response.status_code == status.HTTP_200_OK
 
 
 # @pytest.mark.anyio

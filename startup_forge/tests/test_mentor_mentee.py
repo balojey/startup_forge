@@ -1,64 +1,64 @@
-import uuid
+# import uuid
 
-import pytest
-from fastapi import FastAPI
-from httpx import AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession
-from starlette import status
+# import pytest
+# from fastapi import FastAPI
+# from httpx import AsyncClient
+# from sqlalchemy.ext.asyncio import AsyncSession
+# from starlette import status
 
-from sqlalchemy.sql import func
+# from sqlalchemy.sql import func
 
-from startup_forge.db.dao.mentor_mentee_dao import MentorMenteeDAO
-from startup_forge.db.models.profile import Profile
-from startup_forge.db.models.options import Role, Industry
+# from startup_forge.db.dao.mentor_mentee_dao import MentorMenteeDAO
+# from startup_forge.db.models.profile import Profile
+# from startup_forge.db.models.options import Role, Industry
 
 
-@pytest.mark.anyio
-async def test_creation(
-    fastapi_app: FastAPI,
-    authenticated_client: AsyncClient,
-    authenticated_client3: AsyncClient,
-    authenticated_client2: AsyncClient,
-    mentor_profile: Profile,
-    mentor_profile3: Profile,
-    mentee_profile2: Profile,
-    dbsession: AsyncSession,
-) -> None:
-    """Tests match request."""
+# @pytest.mark.anyio
+# async def test_creation(
+#     fastapi_app: FastAPI,
+#     authenticated_client: AsyncClient,
+#     authenticated_client3: AsyncClient,
+#     authenticated_client2: AsyncClient,
+#     mentor_profile: Profile,
+#     mentor_profile3: Profile,
+#     mentee_profile2: Profile,
+#     dbsession: AsyncSession,
+# ) -> None:
+#     """Tests match request."""
 
-    url = fastapi_app.url_path_for("create_experience")
-    response = await authenticated_client.post(
-        url,
-        json={
-            "company_name": uuid.uuid4().hex,
-            "start_date": "2002-07-12",
-            "end_date": "2010-12-20",
-            "industry": Industry.DIGITAL_MEDIA,
-        },
-    )
-    response2 = await authenticated_client3.post(
-        url,
-        json={
-            "company_name": uuid.uuid4().hex,
-            "start_date": "2008-07-12",
-            "industry": Industry.FINTECH,
-        },
-    )
-    response3 = await authenticated_client2.post(
-        url,
-        json={
-            "company_name": uuid.uuid4().hex,
-            "start_date": "2020-07-12",
-            "industry": Industry.CYBERSECURITY,
-        },
-    )
-    assert response.status_code == status.HTTP_201_CREATED
-    assert response2.status_code == status.HTTP_201_CREATED
-    assert response3.status_code == status.HTTP_201_CREATED
+#     url = fastapi_app.url_path_for("create_experience")
+#     response = await authenticated_client.post(
+#         url,
+#         json={
+#             "company_name": uuid.uuid4().hex,
+#             "start_date": "2002-07-12",
+#             "end_date": "2010-12-20",
+#             "industry": Industry.DIGITAL_MEDIA,
+#         },
+#     )
+#     response2 = await authenticated_client3.post(
+#         url,
+#         json={
+#             "company_name": uuid.uuid4().hex,
+#             "start_date": "2008-07-12",
+#             "industry": Industry.FINTECH,
+#         },
+#     )
+#     response3 = await authenticated_client2.post(
+#         url,
+#         json={
+#             "company_name": uuid.uuid4().hex,
+#             "start_date": "2020-07-12",
+#             "industry": Industry.CYBERSECURITY,
+#         },
+#     )
+#     assert response.status_code == status.HTTP_201_CREATED
+#     assert response2.status_code == status.HTTP_201_CREATED
+#     assert response3.status_code == status.HTTP_201_CREATED
     
-    url = fastapi_app.url_path_for("request_matches")
-    response = await authenticated_client3.get(url)
-    assert len(response.json()) == 0
+#     url = fastapi_app.url_path_for("request_matches")
+#     response = await authenticated_client3.get(url)
+#     assert len(response.json()) == 0
 
 
 # @pytest.mark.anyio

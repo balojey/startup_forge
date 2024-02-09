@@ -34,7 +34,7 @@ def get_app() -> FastAPI:
     register_shutdown_event(app)
 
     # Add middleware
-    app.add_middleware(PyInstrumentProfilerMiddleware)
+    # app.add_middleware(PyInstrumentProfilerMiddleware)
 
     # Main router for the API.
     app.include_router(router=api_router, prefix="/api/v1")
