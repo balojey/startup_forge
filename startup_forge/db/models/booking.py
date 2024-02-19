@@ -42,7 +42,7 @@ class Booking(BaseModel, Base):
     )
     date: Mapped[date] = mapped_column(Date(), nullable=False)
 
-    time_slot: Mapped[TimeSlot] = relationship("TimeSlot", back_populates="booking")
+    time_slot: Mapped[TimeSlot] = relationship("TimeSlot", back_populates="bookings")
     booking_activity: Mapped["BookingActivity"] = relationship(
         "BookingActivity", back_populates="booking"
     )

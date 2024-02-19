@@ -2,6 +2,7 @@ from importlib import metadata
 from pathlib import Path
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import UJSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi_profiler import PyInstrumentProfilerMiddleware
@@ -35,8 +36,14 @@ def get_app() -> FastAPI:
 
     # Add middleware
     # app.add_middleware(PyInstrumentProfilerMiddleware)
+    app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    ) 
 
-    # Main router for the API.
     app.include_router(router=api_router, prefix="/api/v1")
     # Adds static directory.
     # This directory is used to access swagger files.
