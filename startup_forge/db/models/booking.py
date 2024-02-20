@@ -1,4 +1,4 @@
-from datetime import time
+from datetime import time, date as dt
 from uuid import UUID
 
 from sqlalchemy import ForeignKey, Enum, UniqueConstraint
@@ -40,7 +40,7 @@ class Booking(BaseModel, Base):
     time_slot_id: Mapped[UUID] = mapped_column(
         Uuid(), ForeignKey("time_slot.id", ondelete="CASCADE", onupdate="CASCADE")
     )
-    date: Mapped[date] = mapped_column(Date(), nullable=False)
+    date: Mapped[dt] = mapped_column(Date(), nullable=False)
 
     time_slot: Mapped[TimeSlot] = relationship("TimeSlot", back_populates="bookings")
     booking_activity: Mapped["BookingActivity"] = relationship(

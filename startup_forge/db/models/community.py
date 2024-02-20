@@ -1,4 +1,4 @@
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from sqlalchemy import ForeignKey, PrimaryKeyConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -61,6 +61,7 @@ class CommentReply(Base):
 
     __tablename__ = "comment_reply"
 
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     comment_id: Mapped[UUID] = mapped_column(
         Uuid(), ForeignKey("comment.id", ondelete="CASCADE", onupdate="CASCADE")
     )
@@ -70,7 +71,7 @@ class CommentReply(Base):
         nullable=True,
     )
 
-    PrimaryKeyConstraint(comment_id, reply_id)
+    # PrimaryKeyConstraint(comment_id, reply_id)
 
 
 class Repost(Base):
