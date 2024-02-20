@@ -18,7 +18,7 @@ jobs:
           dist: latest
 
       - name: Login to Fly.io
-        uses: flyctl/flyctl-github-action@master
+        uses: superfly/flyctl-actions/setup-flyctl@master
         with:
           api-token: ${{ secrets.FLY_API_TOKEN }}
 
@@ -33,7 +33,7 @@ jobs:
             FLY_API_TOKEN=${{ secrets.FLY_API_TOKEN }}
 
       - name: Deploy
-        uses: flyctl/flyctl-github-action@master
+        uses: superfly/flyctl-actions/setup-flyctl@master
         with:
           api-token: ${{ secrets.FLY_API_TOKEN }}
           command: deploy
