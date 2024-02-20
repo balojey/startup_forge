@@ -1,4 +1,4 @@
-# fly.toml app configuration file generated for startup-forge on 2024-02-20T00:49:10+01:00
+# fly.toml app configuration file generated for startup-forge on 2024-02-20T02:06:47+01:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
@@ -7,10 +7,7 @@ app = 'startup-forge'
 primary_region = 'lhr'
 
 [build]
-  builder = 'paketobuildpacks/builder:base'
-
-[env]
-  PORT = '8080'
+  dockerfile = 'deploy/Dockerfile'
 
 [http_service]
   internal_port = 8080
