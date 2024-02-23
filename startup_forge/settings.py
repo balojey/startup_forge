@@ -28,8 +28,8 @@ class Settings(BaseSettings):
     with environment variables.
     """
 
-    host: str = "127.0.0.1"
-    port: int = 8000
+    host: str = "0.0.0.0"
+    port: int = 8080
     # quantity of workers for uvicorn
     workers_count: int = 1
     # Enable uvicorn reloading
@@ -40,7 +40,7 @@ class Settings(BaseSettings):
 
     log_level: LogLevel = LogLevel.INFO
     users_secret: str = os.getenv("USERS_SECRET", "")
-    jwt_lifetime_seconds: int = os.getenv("STARTUP_FORGE_JWT_LIFETIME_SECONDS")
+    jwt_lifetime_seconds: int = os.getenv("STARTUP_FORGE_JWT_LIFETIME_SECONDS", 86400)
     # Variables for the database
     db_host: str = "localhost"
     db_port: int = 5432
