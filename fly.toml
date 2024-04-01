@@ -1,0 +1,23 @@
+# fly.toml app configuration file generated for startup-forge on 2024-02-24T20:25:40+01:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'startup-forge'
+primary_region = 'lhr'
+
+[build]
+  dockerfile = 'deploy/Dockerfile'
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1
