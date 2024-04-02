@@ -42,11 +42,11 @@ class Settings(BaseSettings):
     users_secret: str = os.getenv("USERS_SECRET", "")
     jwt_lifetime_seconds: int = os.getenv("STARTUP_FORGE_JWT_LIFETIME_SECONDS", 86400)
     # Variables for the database
-    db_host: str = os.getenv("STARTUP_FORGE_DB_HOST")   #"localhost"
-    db_port: int = os.getenv("STARTUP_FORGE_DB_PORT")
-    db_user: str = os.getenv("STARTUP_FORGE_DB_USER")   #"startup_forge"
-    db_pass: str = os.getenv("STARTUP_FORGE_DB_PASS")   #"startup_forge"
-    db_base: str = os.getenv("STARTUP_FORGE_DB_BASE")  #"startup_forge"
+    db_host: str = os.getenv("STARTUP_FORGE_DB_HOST", "localhost")   #"localhost"
+    db_port: int = os.getenv("STARTUP_FORGE_DB_PORT", 5432)
+    db_user: str = os.getenv("STARTUP_FORGE_DB_USER", "startup_forge")   #"startup_forge"
+    db_pass: str = os.getenv("STARTUP_FORGE_DB_PASS", "startup_forge")   #"startup_forge"
+    db_base: str = os.getenv("STARTUP_FORGE_DB_BASE", "startup_forge")  #"startup_forge"
     db_echo: bool = False
 
     @property
